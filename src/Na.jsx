@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Plus, Trash2, Edit2, Check, X, GripVertical, Clock } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import {  Bell,  Plus,  Trash2,  Edit2,  Check,X,GripVertical,Clock,} from "lucide-react";
 
 /**
  * NoteAlarm - A task reminder application with CRUD operations and alarms
@@ -12,25 +12,25 @@ import { Bell, Plus, Trash2, Edit2, Check, X, GripVertical, Clock } from 'lucide
 export default function NoteAlarm() {
   // State for managing tasks
   const [tasks, setTasks] = useState([]);
-  
+
   // State for new task input form
   const [newTask, setNewTask] = useState({
-    title: '',
-    description: '',
-    interval: 5 // Default interval in minutes
+    title: "",
+    description: "",
+    interval: 5, // Default interval in minutes
   });
-  
+
   // State for editing existing task
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({
-    title: '',
-    description: '',
-    interval: 5
+    title: "",
+    description: "",
+    interval: 5,
   });
-  
+
   // State for drag and drop
   const [draggedTask, setDraggedTask] = useState(null);
-  
+
   // Ref to store interval timers
   const timersRef = useRef({});
 
@@ -38,13 +38,13 @@ export default function NoteAlarm() {
    * Load tasks from localStorage on component mount
    */
   useEffect(() => {
-    const savedTasks = localStorage.getItem('noteAlarmTasks');
+    const savedTasks = localStorage.getItem("noteAlarmTasks");
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
         setTasks(parsedTasks);
       } catch (error) {
-        console.error('Error loading tasks from localStorage:', error);
+        console.error("Error loading tasks from localStorage:", error);
       }
     }
   }, []);
@@ -54,9 +54,9 @@ export default function NoteAlarm() {
    */
   useEffect(() => {
     if (tasks.length > 0) {
-      localStorage.setItem('noteAlarmTasks', JSON.stringify(tasks));
+      localStorage.setItem("noteAlarmTasks", JSON.stringify(tasks));
     } else {
-      localStorage.removeItem('noteAlarmTasks');
+      localStorage.removeItem("noteAlarmTasks");
     }
   }, [tasks]);
 
@@ -65,14 +65,14 @@ export default function NoteAlarm() {
    */
   useEffect(() => {
     // Clear all existing timers
-    Object.values(timersRef.current).forEach(timer => clearInterval(timer));
+    Object.values(timersRef.current).forEach((timer) => clearInterval(timer));
     timersRef.current = {};
 
     // Set up new timers for each task
-    tasks.forEach(task => {
+    tasks.forEach((task) => {
       if (task.interval > 0) {
         const intervalMs = task.interval * 60 * 1000; // Convert minutes to milliseconds
-        
+
         timersRef.current[task.id] = setInterval(() => {
           triggerAlarm(task);
         }, intervalMs);
@@ -81,7 +81,7 @@ export default function NoteAlarm() {
 
     // Cleanup function to clear timers when component unmounts
     return () => {
-      Object.values(timersRef.current).forEach(timer => clearInterval(timer));
+      Object.values(timersRef.current).forEach((timer) => clearInterval(timer));
     };
   }, [tasks]);
 
@@ -91,49 +91,55 @@ export default function NoteAlarm() {
    */
   const triggerAlarm = (task) => {
     // Create and play alarm sound using Web Audio API
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+
     // Function to create a beep sound
     const playBeep = (frequency, duration, delay = 0) => {
       setTimeout(() => {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
-        
+
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
-        
+
         oscillator.frequency.value = frequency;
-        oscillator.type = 'sine';
-        
+        oscillator.type = "sine";
+
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + duration
+        );
+
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + duration);
       }, delay);
     };
-    
+
     // Play alarm pattern: 3 beeps with increasing frequency
-    playBeep(800, 0.2, 0);      // First beep
-    playBeep(1000, 0.2, 500);   // Second beep
-    playBeep(1200, 0.4, 1000);   // Third beep (longer)
-    
+    playBeep(800, 0.2, 0); // First beep
+    playBeep(1000, 0.2, 500); // Second beep
+    playBeep(1200, 0.4, 1000); // Third beep (longer)
+
     // Browser notification
-    if ('Notification' in window) {
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          new Notification('NoteAlarm Reminder 🔔', {
+    if ("Notification" in window) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          new Notification("NoteAlarm Reminder 🔔", {
             body: `Task: ${task.title}\n${task.description}`,
-            icon: '🔔',
-            requireInteraction: true
+            icon: "🔔",
+            requireInteraction: true,
           });
         }
       });
     }
-    
+
     // Visual alert
     setTimeout(() => {
-      alert(`🔔 TASK REMINDER 🔔\n\nTask: ${task.title}\n${task.description}\n\nInterval: Every ${task.interval} minutes`);
+      alert(
+        `🔔 TASK REMINDER 🔔\n\nTask: ${task.title}\n${task.description}\n\nInterval: Every ${task.interval} minutes`
+      );
     }, 1000);
   };
 
@@ -142,9 +148,9 @@ export default function NoteAlarm() {
    */
   const handleCreateTask = (e) => {
     e.preventDefault();
-    
+
     if (!newTask.title.trim()) {
-      alert('Please enter a task title');
+      alert("Please enter a task title");
       return;
     }
 
@@ -153,16 +159,16 @@ export default function NoteAlarm() {
       title: newTask.title.trim(),
       description: newTask.description.trim(),
       interval: parseInt(newTask.interval) || 5,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     setTasks([...tasks, task]);
-    
+
     // Reset form
     setNewTask({
-      title: '',
-      description: '',
-      interval: 5
+      title: "",
+      description: "",
+      interval: 5,
     });
   };
 
@@ -171,9 +177,9 @@ export default function NoteAlarm() {
    * @param {string} id - The task ID to delete
    */
   const handleDeleteTask = (id) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      setTasks(tasks.filter(task => task.id !== id));
-      
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      setTasks(tasks.filter((task) => task.id !== id));
+
       // Clear the timer for this task
       if (timersRef.current[id]) {
         clearInterval(timersRef.current[id]);
@@ -191,7 +197,7 @@ export default function NoteAlarm() {
     setEditForm({
       title: task.title,
       description: task.description,
-      interval: task.interval
+      interval: task.interval,
     });
   };
 
@@ -200,20 +206,22 @@ export default function NoteAlarm() {
    */
   const handleSaveEdit = () => {
     if (!editForm.title.trim()) {
-      alert('Please enter a task title');
+      alert("Please enter a task title");
       return;
     }
 
-    setTasks(tasks.map(task => 
-      task.id === editingId
-        ? {
-            ...task,
-            title: editForm.title.trim(),
-            description: editForm.description.trim(),
-            interval: parseInt(editForm.interval) || 5
-          }
-        : task
-    ));
+    setTasks(
+      tasks.map((task) =>
+        task.id === editingId
+          ? {
+              ...task,
+              title: editForm.title.trim(),
+              description: editForm.description.trim(),
+              interval: parseInt(editForm.interval) || 5,
+            }
+          : task
+      )
+    );
 
     setEditingId(null);
   };
@@ -248,8 +256,8 @@ export default function NoteAlarm() {
   const handleDrop = (targetTask) => {
     if (!draggedTask || draggedTask.id === targetTask.id) return;
 
-    const draggedIndex = tasks.findIndex(t => t.id === draggedTask.id);
-    const targetIndex = tasks.findIndex(t => t.id === targetTask.id);
+    const draggedIndex = tasks.findIndex((t) => t.id === draggedTask.id);
+    const targetIndex = tasks.findIndex((t) => t.id === targetTask.id);
 
     const newTasks = [...tasks];
     newTasks.splice(draggedIndex, 1);
@@ -263,13 +271,16 @@ export default function NoteAlarm() {
    * Request notification permission on first interaction
    */
   const requestNotificationPermission = () => {
-    if ('Notification' in window && Notification.permission === 'default') {
+    if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4" onClick={requestNotificationPermission}>
+    <div
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4"
+      onClick={requestNotificationPermission}
+    >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
@@ -277,7 +288,10 @@ export default function NoteAlarm() {
             <Bell className="w-8 h-8 text-indigo-600" />
             <h1 className="text-3xl font-bold text-gray-800">NoteAlarm</h1>
           </div>
-          <p className="text-gray-600">Never forget your tasks again! Set reminders at your preferred intervals.</p>
+          <p className="text-gray-600">
+            Never forget your tasks again! Set reminders at your preferred
+            intervals.
+          </p>
         </div>
 
         {/* Create Task Form */}
@@ -294,7 +308,9 @@ export default function NoteAlarm() {
               <input
                 type="text"
                 value={newTask.title}
-                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, title: e.target.value })
+                }
                 placeholder="Enter task title..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
@@ -305,7 +321,9 @@ export default function NoteAlarm() {
               </label>
               <textarea
                 value={newTask.description}
-                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, description: e.target.value })
+                }
                 placeholder="Add task description..."
                 rows="3"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -318,7 +336,9 @@ export default function NoteAlarm() {
               <input
                 type="number"
                 value={newTask.interval}
-                onChange={(e) => setNewTask({ ...newTask, interval: e.target.value })}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, interval: e.target.value })
+                }
                 min="1"
                 placeholder="5"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -339,7 +359,7 @@ export default function NoteAlarm() {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Your Tasks ({tasks.length})
           </h2>
-          
+
           {tasks.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Bell className="w-16 h-16 mx-auto mb-4 opacity-30" />
@@ -362,19 +382,28 @@ export default function NoteAlarm() {
                       <input
                         type="text"
                         value={editForm.title}
-                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, title: e.target.value })
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                       />
                       <textarea
                         value={editForm.description}
-                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            description: e.target.value,
+                          })
+                        }
                         rows="2"
                         className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                       />
                       <input
                         type="number"
                         value={editForm.interval}
-                        onChange={(e) => setEditForm({ ...editForm, interval: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, interval: e.target.value })
+                        }
                         min="1"
                         className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                       />
@@ -400,9 +429,13 @@ export default function NoteAlarm() {
                     <div className="flex items-start gap-3">
                       <GripVertical className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
                       <div className="flex-grow">
-                        <h3 className="font-semibold text-gray-800 text-lg">{task.title}</h3>
+                        <h3 className="font-semibold text-gray-800 text-lg">
+                          {task.title}
+                        </h3>
                         {task.description && (
-                          <p className="text-gray-600 mt-1">{task.description}</p>
+                          <p className="text-gray-600 mt-1">
+                            {task.description}
+                          </p>
                         )}
                         <div className="flex items-center gap-2 mt-2 text-sm text-indigo-600">
                           <Clock className="w-4 h-4" />
@@ -435,8 +468,13 @@ export default function NoteAlarm() {
 
         {/* Footer Info */}
         <div className="mt-6 text-center text-sm text-gray-600 bg-white rounded-lg shadow p-4">
-          <p>💡 Tip: Drag tasks to reorder them. Alarms will trigger at your specified intervals.</p>
-          <p className="mt-1">Click anywhere to enable notifications for alarms.</p>
+          <p>
+            💡 Tip: Drag tasks to reorder them. Alarms will trigger at your
+            specified intervals.
+          </p>
+          <p className="mt-1">
+            Click anywhere to enable notifications for alarms.
+          </p>
         </div>
       </div>
     </div>
