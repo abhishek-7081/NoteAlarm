@@ -5,7 +5,7 @@ import NoteAlarm from './Na';
 function App() {
   return (
     <div className="App">
-      <NoteAlarm/>
+      <NoteAlarm />
     </div>
   );
 }

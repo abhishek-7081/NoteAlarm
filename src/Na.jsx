@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {  Bell,  Plus,  Trash2,  Edit2,  Check,X,GripVertical,Clock,} from "lucide-react";
+import { Bell, Plus, Trash2, Edit2, Check, X, GripVertical, Clock, } from "lucide-react";
 
 /**
  * NoteAlarm - A task reminder application with CRUD operations and alarms
@@ -214,11 +214,11 @@ export default function NoteAlarm() {
       tasks.map((task) =>
         task.id === editingId
           ? {
-              ...task,
-              title: editForm.title.trim(),
-              description: editForm.description.trim(),
-              interval: parseInt(editForm.interval) || 5,
-            }
+            ...task,
+            title: editForm.title.trim(),
+            description: editForm.description.trim(),
+            interval: parseInt(editForm.interval) || 5,
+          }
           : task
       )
     );
